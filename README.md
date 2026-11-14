@@ -1,75 +1,83 @@
-# P1 – Assessment-Aware Study Planner (Search + CSP + Neural Network)
-
-Decision-support tool for a distance-learning student: how many study sessions per upcoming
-assignment, and in which weekly slots, so that **predicted** marks reach a target with the fewest
-sessions. Uses the Open University Learning Analytics Dataset (OULAD).
-
-```
- Search (UCS / Greedy / A*)  --proposes plan-->  NN (predicted marks >= target?)
-          ^                                              |  yes
-          |   CSP says "no schedule": discard plan       v
-          +---------------------------------------  CSP (BT / FC / AC-3) builds the timetable
-```
-
-> **Decision support only.** The link between effort (clicks) and marks in OULAD is
-> *observational*. The planner is a what-if tool, not evidence that more sessions *cause* higher marks.
-
-## 1. Environment
-```bash
-python3 -m venv .venv && source .venv/bin/activate        # Python 3.12 was used
-pip install -r requirements.txt                            # versions are pinned
-```
-
-## 2. Exact run commands
-```bash
-python make_data.py --inspect      # Week-1 check: exact tables/columns, modules & presentations
-python make_data.py                # download OULAD (or: --zip anonymisedData.zip), preprocess, seed 42
-python train_nn.py                 # train on earlier presentations, test on the later one + baselines
-python run_profiles.py             # allocation + timetable + predicted marks for 30 student profiles
-python run_experiments.py          # 3 experiments x 5 seeds + monotonicity test -> results/
-python run_demo.py                 # integrated demo (input, search trace, CSP pruning, NN on/off, rejection)
-python -m unittest discover -s tests -v    # 37 tests (normal / edge / impossible)
-```
-Offline smoke test of the whole pipeline (NOT real data, flagged everywhere): `python make_data.py --synthetic`.
-
-## 3. Layout (checklist item 1)
-| Path | Purpose |
-|---|---|
-| `make_data.py` | download / preprocess, fixed seed (item 2) |
-| `src/planner/data/` | `oulad.py` (chunked click aggregation, features), `profiles.py`, `synthetic.py` (test-only) |
-| `src/planner/nn/` | `model.py`: MLP + baselines (item 4); top-level `train_nn.py` trains/evaluates |
-| `src/planner/search/` | `algorithms.py`: UCS, Greedy, A* with counters (item 5) |
-| `src/planner/csp/` | `model.py`, `solvers.py`: BT, FC, AC-3 switchable, counters (item 6) |
-| `src/planner/integration/` | `planner.py`: Search -> NN -> CSP loop (item 7) |
-| `src/planner/eval/` | `experiments.py`, `monotonicity.py`, `plots.py` (item 10) |
-| `tests/` | 37 unit tests (item 9) |
-| `DATA_DICTIONARY.md` | every column, real vs generated (item 3) |
-| `docs/` | report outline, presentation/demo script, contribution statements (items 11-13) |
-
-## 4. Key design decisions
-* **State** = sessions per assignment, e.g. `(4,5,3)`; **action** = add one session; step cost 1.
-* **Goal test** = NN predicts every mark >= target **and** the CSP finds a schedule.
-  If the CSP fails the node is discarded and its subtree pruned (more sessions can't fix an infeasible schedule).
-* **A\*** uses `h = sum_i ceil(shortfall_i / max_gain_i)`, where `max_gain_i` is the largest one-session
-  gain of the NN curve for assignment *i*. It is admissible and consistent *with respect to that curve*.
-* **Monotone envelope**: the raw NN can predict a lower mark after adding a session. The monotonicity
-  test reports these violations on the raw network; the planner uses the running maximum so that
-  search/heuristics stay sound (switch off with `envelope=False`).
-* **CSP**: variables = sessions, values = weekly slots in the 4 weeks before the deadline (the same window the NN sees),
-  all-different + in-order constraints, blocked slots removed from domains.
-  `csp_precheck` (default on) uses a counting (Hall) test on non-goal nodes for speed; the demo/tests
-  switch it off to show the real solver rejecting a plan. In this model the ordering constraint never
-  makes feasibility harder, so the CSP mainly produces the timetable and the counters for Experiment 2.
-* **Counters**: search = nodes expanded / generated / rejected; CSP = assignments (value tries),
-  backtracks (undone assignments), AC-3 revisions/removed values, FC removed values. Note that BT and BT+FC
-  often have the *same backtracks* but FC needs far fewer *assignments*.
-
-## 5. Status / honest caveats
-* The code was developed and tested against **synthetic OULAD-shaped tables** because the sandbox it was written in had no
-  internet. **Run `make_data.py` yourself on the real data and re-check**: the download URL, the module/presentations
-  in `config.py` (default FFF; train 2013B/2013J/2014B, test 2014J), and the activity-group mapping are unverified.
-  Use `--inspect` to choose a module whose presentations share the same assessment structure.
-* No result in `results/` may be quoted in the report unless `meta.json` says `"synthetic": false`.
-* Planned assignments are the last 3 TMA/CMA of the test presentation; previous-score features are a snapshot taken before the
-  first planned assignment (marks of later planned assignments are unknown at planning time).
-* Sessions are assumed to add clicks (rule G1) — an assumption, not a measured effect.
+**P1 – Assessment-Aware Study Planner (Search + CSP + Neural Network)**  
+Decision-support tool for a distance-learning student: how many study sessions per upcoming assignment, and in which weekly slots, so that **predicted** marks reach a target with the fewest sessions. Built for the Intelligent Systems course on the Open University Learning Analytics Dataset (OULAD).  
+ Search (UCS / Greedy / A*)  --proposes plan-->  NN (predicted marks >= target?)  
+           ^                                              |  yes  
+           |   CSP says "no schedule": discard plan       v  
+           +---------------------------------------  CSP (BT / FC / AC-3) builds the timetable  
+   
+***Decision support only.*** * The link between effort (clicks) and marks in OULAD is * *observational* *. The planner is a what-if tool, not evidence that more sessions * *cause* * higher marks.*  
+Authors: Ibrahim Eltemsahy,Moatassem Muhammed.  
+**1. Environment**  
+Python 3.12 was used for development (3.14 also ran the full pipeline and all tests). Versions are pinned in requirements.txt.  
+python3 -m venv .venv  
+ source .venv/bin/activate          # Windows: .venv\Scripts\activate  
+ pip install -r requirements.txt  
+   
+**2. Get the data**  
+OULAD is public (CC BY 4.0) and needs no registration. Download anonymisedData.zip (about 45 MB) from one of:  
+- [https://analyse.kmi.open.ac.uk/open_dataset](https://analyse.kmi.open.ac.uk/open_dataset "https://analyse.kmi.open.ac.uk/open_dataset")  
+- [https://figshare.com/articles/OULAD_Open_University_Learning_Analytics_Dataset/5081998](https://figshare.com/articles/OULAD_Open_University_Learning_Analytics_Dataset/5081998 "https://figshare.com/articles/OULAD_Open_University_Learning_Analytics_Dataset/5081998")  
+Keep the zip anywhere (for example ~/Downloads); make_data.py extracts the four tables it needs into data/raw/. If the automatic download inside make_data.py fails, it prints these instructions.  
+**3. Exact run commands**  
+Run them in this order from the project root (the demo needs the trained model from step 3):  
+python make_data.py --zip ~/Downloads/anonymisedData.zip   # extract tables, preprocess (seed 42)  
+ python make_data.py --inspect      # optional: list modules/presentations to check the course choice  
+ python train_nn.py                 # train on earlier presentations, test on the later one + baselines  
+ python run_profiles.py             # allocation + timetable + predicted marks for 30 student profiles  
+ python run_experiments.py          # 3 experiments x 5 seeds + monotonicity test -> results/   (~1.5 min)  
+ python run_demo.py                 # integrated demo: input, search trace, CSP pruning, NN on/off, rejection (~2 min)  
+ python -m unittest discover -s tests -v    # 37 tests (normal / edge / impossible)  
+   
+python make_data.py without --zip tries to download the dataset itself. After it finishes, check data/processed/meta.json says "synthetic": false.  
+Offline smoke test of the whole pipeline (NOT real data, flagged everywhere): python make_data.py --synthetic, then the same commands. Delete data/raw/* and data/processed/* before switching to real data.  
+**4. Data used**  
+- **Course:** module FFF.  **Train:** presentations 2013B, 2013J, 2014B (38,242 student-assessment rows).  **Test:** 2014J (15,907 rows). Set in src/planner/config.py.  
+- Only TMA and CMA assessments with a deadline are used. Gender, age, region, disability and deprivation columns are never used.  
+- Scores and clicks are real. Study-session length, slot capacity, blocked slots, deadline compression and target marks are generated by documented seeded rules. See DATA_DICTIONARY.md.  
+**5. Results on the real data**  
+All numbers below come from the commands in section 3 (results/).  
+**Neural network** (test presentation 2014J, results/nn_metrics.json):  
+| | | | |  
+|-|-|-|-|  
+| **Model** | **MAE** | **RMSE** | **R²** |   
+| NN (MLP 16-8) | 7.85 | 10.76 | 0.432 |   
+| Baseline: average of previous marks | 8.94 | 12.21 | 0.269 |   
+| Baseline: global mean | 11.26 | 14.36 | -0.011 |   
+   
+**Planner on 30 profiles** (results/profile_plans.csv): 5 plans found (4 need 0 extra sessions, 1 needs 1 session) and 25 reported as unreachable with the best feasible marks.  
+**Experiment 1, search** (5 seeds, mean ± sd): UCS expands 7.66 ± 5.47 nodes, Greedy 1.97 ± 0.67, A* 2.11 ± 0.75. All three return the same cost (0.965 ± 0.666 sessions); none was suboptimal.  
+**Experiment 2, CSP** (mean assignments; 2 / 3 / 4 slots per week): BT 33 / 1,509 / 7,076; BT+FC 10 / 269 / 3,786; BT+FC+AC-3 9 / 29 / 547. Full tables with backtracks and standard deviations are in results/exp2_csp_summary.md.  
+**Experiment 3, NN vs average-mark predictor:** the average predictor finds more plans (39% vs 26%) only because it ignores clicks and never asks for extra sessions; the NN asks for effort in 8.3% of cases and has slightly lower error.  
+**Monotonicity:** 2 of 90 raw NN curves go down when a session is added (2 of 1,080 steps, maximum drop 0.70 marks).  
+Figures are in results/figures/. The report (docs/report.docx) discusses all of this.  
+**6. Layout**  
+| | |  
+|-|-|  
+| **Path** | **Purpose** |   
+| make_data.py | download / preprocess, fixed seed |   
+| src/planner/data/ | oulad.py (chunked click aggregation, features), profiles.py, synthetic.py (test-only) |   
+| src/planner/nn/ | model.py: MLP + baselines; top-level train_nn.py trains/evaluates |   
+| src/planner/search/ | algorithms.py: UCS, Greedy, A* with counters |   
+| src/planner/csp/ | model.py, solvers.py: BT, FC, AC-3 switchable, with counters |   
+| src/planner/integration/ | planner.py: Search -> NN -> CSP loop |   
+| src/planner/eval/ | experiments.py, monotonicity.py, plots.py |   
+| tests/ | 37 unit tests |   
+| DATA_DICTIONARY.md | every column, real vs generated |   
+| results/ | experiment tables, profile plans, metrics and figures |   
+| docs/ | report, presentation/demo script, contribution statements |   
+   
+**7. Key design decisions**  
+- **State** = sessions per assignment, e.g. (4,5,3);  **action** = add one session; step cost 1.  
+- **Goal test** = NN predicts every mark >= target  **and** the CSP finds a schedule. If the CSP fails, the node is discarded and its subtree pruned (more sessions cannot fix an infeasible schedule).  
+- **A*** uses h = sum_i ceil(shortfall_i / max_gain_i), where max_gain_i is the largest one-session gain of the NN curve for assignment *i*. It is admissible and consistent  *with respect to that curve*.  
+- **Monotone envelope:** the raw NN can predict a lower mark after adding a session. The monotonicity test reports these violations on the raw network; the planner uses the running maximum so search and heuristics stay sound (switch off with envelope=False).  
+- **CSP:** variables = sessions, values = weekly slots in the 4 weeks before the deadline (the window the NN sees), all-different + in-order constraints, blocked slots removed from domains. csp_precheck (default on) uses a counting (Hall) test for speed; the demo and tests switch it off to show the real solver rejecting a plan.  
+- **Counters:** search = nodes expanded / generated / rejected; CSP = assignments (value tries), backtracks (undone assignments), AC-3 revisions/removed values, FC removed values. BT and BT+FC often have similar backtracks, but FC needs far fewer assignments.  
+- **No solution:** if no plan reaches the target, the planner says the target is unreachable at this capacity and shows the best predicted marks that are possible.  
+**8. Limitations**  
+- **Cause vs correlation:** effort and marks are observationally linked in OULAD; the planner does not show that studying more causes better marks.  
+- **Weak response to effort:** on this course the NN depends mostly on earlier marks and reacts only weakly to extra clicks, so most generated targets (earlier-baseline + 2 to 6 marks) cannot be reached (25 of 30 profiles).  
+- The session length (clicks per session, rule G1), slot capacity, blocked slots, compressed deadlines and target marks are assumptions, not measurements.  
+- One course only; previous-score features are a snapshot taken before the first planned assignment (marks of later planned assignments are unknown at planning time).  
+- The monotone envelope hides small NN non-monotonicity from the search; the counting pre-check makes the CSP mostly a scheduler for plans that are feasible.  
+- No result from a --synthetic run may be quoted: check "synthetic": false in data/processed/meta.json.  

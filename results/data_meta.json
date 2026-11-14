@@ -1,0 +1,15 @@
+{
+  "module": "FFF",
+  "train": [
+    "2013B",
+    "2013J",
+    "2014B"
+  ],
+  "test": [
+    "2014J"
+  ],
+  "prev_fill": 77.30191935568223,
+  "clicks_per_session": 43,
+  "median_window_clicks_train": 346.0,
+  "synthetic": false
+}

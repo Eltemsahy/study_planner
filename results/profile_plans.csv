@@ -1,0 +1,31 @@
+profile,target,slots_per_week,deadline_weeks,compressed_deadlines,status,allocation,total_sessions,predicted_marks,"timetable(week,slot,assignment,session)",message,nodes_expanded,nn_enough_but_csp_rejected
+P01,82.0,4,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 82 is unreachable at this capacity (4 slots/week). Best predicted marks possible: [80.8, 78.4, 79.2] with allocation (12, 2, 1).",909,0
+P02,84.0,4,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 84 is unreachable at this capacity (4 slots/week). Best predicted marks possible: [82.4, 80.7, 81.5] with allocation (5, 4, 4).",668,0
+P03,75.0,4,"[34, 35, 37]",True,UNREACHABLE,,,,[],"No solution: target 75 is unreachable at this capacity (4 slots/week). Best predicted marks possible: [72.4, 70.4, 71.4] with allocation (8, 8, 8).",1821,0
+P04,66.0,3,"[34, 36, 38]",True,UNREACHABLE,,,,[],"No solution: target 66 is unreachable at this capacity (3 slots/week). Best predicted marks possible: [66.1, 64.9, 65.4] with allocation (2, 8, 5).",960,0
+P05,85.0,2,"[34, 35, 37]",True,UNREACHABLE,,,,[],"No solution: target 85 is unreachable at this capacity (2 slots/week). Best predicted marks possible: [86.2, 84.7, 85.4] with allocation (0, 7, 0).",331,0
+P06,87.0,4,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 87 is unreachable at this capacity (4 slots/week). Best predicted marks possible: [87.3, 85.7, 86.7] with allocation (0, 7, 6).",668,0
+P07,73.0,4,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 73 is unreachable at this capacity (4 slots/week). Best predicted marks possible: [70.8, 68.9, 69.8] with allocation (5, 5, 4).",786,0
+P08,66.0,3,"[34, 36, 38]",True,UNREACHABLE,,,,[],"No solution: target 66 is unreachable at this capacity (3 slots/week). Best predicted marks possible: [63.5, 61.9, 63.1] with allocation (4, 7, 8).",1101,0
+P09,70.0,2,"[34, 34, 34]",False,OK,"(0, 0, 0)",0.0,"[72.0, 70.4, 71.2]",[],Plan found: 0 sessions.,1,0
+P10,79.0,4,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 79 is unreachable at this capacity (4 slots/week). Best predicted marks possible: [75.6, 72.9, 73.7] with allocation (12, 1, 0).",668,0
+P11,80.0,2,"[34, 35, 36]",True,UNREACHABLE,,,,[],"No solution: target 80 is unreachable at this capacity (2 slots/week). Best predicted marks possible: [78.0, 76.0, 76.9] with allocation (5, 1, 2).",202,0
+P12,77.0,2,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 77 is unreachable at this capacity (2 slots/week). Best predicted marks possible: [76.8, 78.3, 79.3] with allocation (0, 0, 0).",84,0
+P13,79.0,4,"[34, 34, 34]",False,OK,"(0, 0, 0)",0.0,"[80.6, 79.0, 79.8]",[],Plan found: 0 sessions.,1,0
+P14,91.0,2,"[34, 36, 38]",True,UNREACHABLE,,,,[],"No solution: target 91 is unreachable at this capacity (2 slots/week). Best predicted marks possible: [86.9, 84.8, 85.9] with allocation (8, 0, 7).",615,0
+P15,92.0,3,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 92 is unreachable at this capacity (3 slots/week). Best predicted marks possible: [88.2, 86.3, 87.1] with allocation (10, 0, 0).",364,0
+P16,60.0,4,"[34, 34, 34]",False,OK,"(0, 0, 1)",1.0,"[60.9, 60.2, 60.0]","[(30, 0, 2, 1)]",Plan found: 1 sessions.,4,0
+P17,85.0,3,"[34, 35, 36]",True,UNREACHABLE,,,,[],"No solution: target 85 is unreachable at this capacity (3 slots/week). Best predicted marks possible: [82.9, 81.0, 81.8] with allocation (10, 2, 3).",740,0
+P18,84.0,3,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 84 is unreachable at this capacity (3 slots/week). Best predicted marks possible: [81.7, 80.1, 80.9] with allocation (3, 2, 3).",220,0
+P19,64.0,4,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 64 is unreachable at this capacity (4 slots/week). Best predicted marks possible: [61.0, 58.6, 60.1] with allocation (5, 1, 5).",455,0
+P20,83.0,2,"[34, 36, 38]",True,OK,"(0, 0, 0)",0.0,"[84.8, 83.1, 84.0]",[],Plan found: 0 sessions.,1,0
+P21,85.0,3,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 85 is unreachable at this capacity (3 slots/week). Best predicted marks possible: [83.6, 81.7, 82.6] with allocation (3, 3, 3).",286,0
+P22,71.0,3,"[34, 36, 37]",True,OK,"(0, 0, 0)",0.0,"[72.8, 71.2, 72.0]",[],Plan found: 0 sessions.,1,0
+P23,88.0,2,"[34, 36, 38]",True,UNREACHABLE,,,,[],"No solution: target 88 is unreachable at this capacity (2 slots/week). Best predicted marks possible: [87.8, 85.9, 87.0] with allocation (5, 0, 7).",344,0
+P24,89.0,3,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 89 is unreachable at this capacity (3 slots/week). Best predicted marks possible: [85.3, 82.9, 84.3] with allocation (6, 0, 5).",455,0
+P25,87.0,4,"[34, 36, 38]",True,UNREACHABLE,,,,[],"No solution: target 87 is unreachable at this capacity (4 slots/week). Best predicted marks possible: [82.4, 80.7, 81.5] with allocation (10, 9, 9).",2049,0
+P26,84.0,3,"[34, 35, 37]",True,UNREACHABLE,,,,[],"No solution: target 84 is unreachable at this capacity (3 slots/week). Best predicted marks possible: [84.0, 82.4, 83.4] with allocation (2, 8, 8).",1156,0
+P27,79.0,4,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 79 is unreachable at this capacity (4 slots/week). Best predicted marks possible: [74.8, 72.8, 73.8] with allocation (4, 5, 5).",786,0
+P28,83.0,3,"[34, 36, 37]",True,UNREACHABLE,,,,[],"No solution: target 83 is unreachable at this capacity (3 slots/week). Best predicted marks possible: [82.9, 81.2, 82.0] with allocation (6, 5, 5).",814,0
+P29,67.0,4,"[34, 36, 37]",True,UNREACHABLE,,,,[],"No solution: target 67 is unreachable at this capacity (4 slots/week). Best predicted marks possible: [67.0, 65.1, 66.1] with allocation (7, 8, 8).",1663,0
+P30,88.0,3,"[34, 34, 34]",False,UNREACHABLE,,,,[],"No solution: target 88 is unreachable at this capacity (3 slots/week). Best predicted marks possible: [87.9, 86.0, 87.5] with allocation (0, 2, 10).",557,0
